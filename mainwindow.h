@@ -16,7 +16,7 @@ public:
     ~MainWindow();
     void dragEnterEvent(QDragEnterEvent *e);
     void dropEvent(QDropEvent *e);
-    void frameFromVideo(QString filePath);
+    void inputToOutput(QString filePath);
 
 
 private slots:

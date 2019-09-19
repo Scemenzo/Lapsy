@@ -46,46 +46,45 @@ void MainWindow::on_pushButton_clicked()
 
 void MainWindow::on_pushButton_2_clicked()
 {
-    frameFromVideo(ui->label_2->text());
+    inputToOutput(ui->label_2->text());
 }
 
-void MainWindow::frameFromVideo(QString filePath){
-    const char * constCharFilePath = filePath.toLocal8Bit().data();
-    cv::VideoCapture inputVideo(constCharFilePath);
-    if(inputVideo.isOpened()){
+void MainWindow::inputToOutput(QString filePath){
+    QFileInfo fileInfo(filePath);
+    QString noExtPath = fileInfo.absolutePath() + "/" + fileInfo.completeBaseName();
+    qDebug() << "Path passato: " << filePath << endl;
+    qDebug() << "Path senza extension: " << noExtPath << endl;
 
+    //Opening input video
+    cv::VideoCapture inputVideo(filePath.toStdString());
+    if(inputVideo.isOpened()){
         qDebug() << "File aperto";
 
-        cv::Mat edges;
-        cv::namedWindow("edges",1);
-
+        //Taking quantized frames
         qDebug() << "cattura frame";
         cv::Mat frame;
-        inputVideo >> frame;
+        for (int i=0; i < 100; i++) {
+            inputVideo.grab();
+        }
+        inputVideo.retrieve(frame);
 
         qDebug() << "conversione frame";
-        cv::cvtColor(frame, edges, CV_8U);
+        cv::cvtColor(frame, frame, CV_8U);
 
-        qDebug() << "display frame";
-        cv::imshow("edges", edges);
-        cv::waitKey(30);
-
-        //Ora il video
-
-        QFileInfo fileInfo(filePath);
-        QString noExtPath = fileInfo.completeBaseName();
-
+        //Creting output video
         cv::VideoWriter outputVideo;
         std::string path = noExtPath.append("_lapsed.avi").toStdString();
+        qDebug() << "Path di memorizzazione: " << QString::fromStdString(path) << endl;
+
         outputVideo.open(
                     path,
-                    static_cast<int>(inputVideo.get(cv::CAP_PROP_FOURCC)),     // Get Codec Type- Int form
+                    static_cast<int>(inputVideo.get(cv::CAP_PROP_FOURCC)),     // Get Codec Type
                     inputVideo.get(cv::CAP_PROP_FPS),
                     cv::Size(int(inputVideo.get(cv::CAP_PROP_FRAME_WIDTH)),int(inputVideo.get(cv::CAP_PROP_FRAME_HEIGHT))));
 
         if(outputVideo.isOpened()){
-            qDebug() << "video aperto con successo";
-            for (int i = 0; i <1000; i++) {
+            qDebug() << "Video output aperto con successo";
+            for (int i = 0; i < 1000; i++) {
                 outputVideo.write(frame);
             }
         }
@@ -94,4 +93,7 @@ void MainWindow::frameFromVideo(QString filePath){
         }
     }
     else qDebug() << "File non aperto correttamente";
+
+    qDebug() << "Procedura inputToOutput terminata";
+
 }

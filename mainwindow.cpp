@@ -68,9 +68,6 @@ void MainWindow::inputToOutput(QString filePath){
         }
         inputVideo.retrieve(frame);
 
-        qDebug() << "conversione frame";
-        cv::cvtColor(frame, frame, CV_8U);
-
         //Creting output video
         cv::VideoWriter outputVideo;
         std::string path = noExtPath.append("_lapsed.avi").toStdString();

@@ -7,6 +7,7 @@
 #include <QFileDialog>
 #include <QDragEnterEvent>
 #include <QMimeData>
+#include <QMessageBox>
 
 #include <opencv4/opencv2/opencv.hpp>
 
@@ -50,47 +51,101 @@ void MainWindow::on_pushButton_2_clicked()
 }
 
 void MainWindow::inputToOutput(QString filePath){
-    QFileInfo fileInfo(filePath);
-    QString noExtPath = fileInfo.absolutePath() + "/" + fileInfo.completeBaseName();
-    qDebug() << "Path passato: " << filePath << endl;
-    qDebug() << "Path senza extension: " << noExtPath << endl;
+    const double OFPS = ui->fPSBox->value();
+    const double ODuration = QTime(0,0,0,0).msecsTo(ui->durationBox->time()) / 1000.0;
+    QProgressBar * bar =  ui->progressBar;
+    bar->setValue(0);
 
-    //Opening input video
-    cv::VideoCapture inputVideo(filePath.toStdString());
-    if(inputVideo.isOpened()){
-        qDebug() << "File aperto";
+    //Check the validity of the user inserted settings
+    if(ODuration > 0 && ui->fPSBox->value() > 0){
+        //Take path without extension
+        QFileInfo fileInfo(filePath);
+        QString noExtPath = fileInfo.absolutePath() + "/" + fileInfo.completeBaseName();
 
-        //Taking quantized frames
-        qDebug() << "cattura frame";
-        cv::Mat frame;
-        for (int i=0; i < 100; i++) {
-            inputVideo.grab();
-        }
-        inputVideo.retrieve(frame);
+        //Opening input video
+        cv::VideoCapture inputVideo(filePath.toStdString());
+        if(inputVideo.isOpened()) {
+            qDebug() << "Input video is opened";
 
-        //Creting output video
-        cv::VideoWriter outputVideo;
-        std::string path = noExtPath.append("_lapsed.avi").toStdString();
-        qDebug() << "Path di memorizzazione: " << QString::fromStdString(path) << endl;
+            //Creting output video path
+            cv::VideoWriter outputVideo;
+            std::string path = noExtPath.append("_lapsed.").append(fileInfo.suffix()).toStdString();
 
-        outputVideo.open(
-                    path,
-                    static_cast<int>(inputVideo.get(cv::CAP_PROP_FOURCC)),     // Get Codec Type
-                    inputVideo.get(cv::CAP_PROP_FPS),
-                    cv::Size(int(inputVideo.get(cv::CAP_PROP_FRAME_WIDTH)),int(inputVideo.get(cv::CAP_PROP_FRAME_HEIGHT))));
+            outputVideo.open(
+                        path,
+                        static_cast<int>(inputVideo.get(cv::CAP_PROP_FOURCC)),     //Codec type
+                        ui->fPSBox->value(),
+                        cv::Size(int(inputVideo.get(cv::CAP_PROP_FRAME_WIDTH)),int(inputVideo.get(cv::CAP_PROP_FRAME_HEIGHT))));
 
-        if(outputVideo.isOpened()){
-            qDebug() << "Video output aperto con successo";
-            for (int i = 0; i < 1000; i++) {
+            if(outputVideo.isOpened()){
+                qDebug() << "Video output opened";
+
+                lockAll();
+
+                //Obtain data from files
+                const double ICount = inputVideo.get(cv::CAP_PROP_FRAME_COUNT);
+                const double OCount = OFPS * ODuration;
+                const double IOCountRatio = ICount/OCount;
+                int framePicker = 0;
+
+                qDebug() << "----Conversion data obtained\n"<<
+                            "\nInput frame count: "<<ICount<<
+                            "\nOutput FPS: "<<OFPS<<
+                            "\nOutput duration: "<<ODuration<<
+                            "\nOutput frame count: "<<OCount;
+
+                //Frame quantization calculation
+                //Write first frame
+                cv::Mat frame;
+                inputVideo.read(frame);
                 outputVideo.write(frame);
+                framePicker++;
+                //for every increment of ratio
+                for (double icnt = IOCountRatio; icnt < ICount; icnt += IOCountRatio){
+                    //skip frames until you reach the approximation of the ratio multiplier
+                    while (framePicker < floor(icnt)) {
+                        inputVideo.grab();
+                        framePicker++;
+                    }
+                    //capture the spicy frame
+                    inputVideo.retrieve(frame);
+                    outputVideo.write(frame);
+                    bar->setValue(ceil(double(icnt)/double(ICount)*100.0));
+                }
+
+                bar->setValue(0);
+
+                unlockAll();
+
+                popupMessage("The procedure is finished", "Success");
+            }
+            else {
+                popupMessage("A problem occurred while loading the input video");
             }
         }
-        else {
-            qDebug() << "errore nell'apertura video";
-        }
+        else popupMessage("A problem occurred while saving the output video");
     }
-    else qDebug() << "File non aperto correttamente";
+    else {
+        popupMessage("The output settings are not valid");
+    }
+}
 
-    qDebug() << "Procedura inputToOutput terminata";
+void MainWindow::popupMessage(QString msg, QString title, int width, int height){
+    QMessageBox messageBox;
+    messageBox.information(nullptr,title,msg);
+    messageBox.setFixedSize(width, height);
+}
 
+void MainWindow::lockAll(){
+    ui->durationBox->setEnabled(false);
+    ui->fPSBox->setEnabled(false);
+    ui->pushButton->setEnabled(false);
+    ui->pushButton_2->setEnabled(false);
+}
+
+void MainWindow::unlockAll(){
+    ui->durationBox->setEnabled(true);
+    ui->fPSBox->setEnabled(true);
+    ui->pushButton->setEnabled(true);
+    ui->pushButton_2->setEnabled(true);
 }

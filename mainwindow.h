@@ -16,9 +16,11 @@ public:
     ~MainWindow();
     void dragEnterEvent(QDragEnterEvent *e);
     void dropEvent(QDropEvent *e);
+
     void inputToOutput(QString filePath);
-
-
+    void popupMessage(QString msg, QString title = "An error occurred", int width = 500, int height = 200);
+    void lockAll();
+    void unlockAll();
 private slots:
     void on_pushButton_clicked();
     void on_pushButton_2_clicked();

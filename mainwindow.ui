@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>445</width>
-    <height>135</height>
+    <width>349</width>
+    <height>166</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -119,6 +119,13 @@
         </item>
        </layout>
       </item>
+      <item alignment="Qt::AlignHCenter">
+       <widget class="QLabel" name="label_5">
+        <property name="text">
+         <string>The file'll be saved in the same directory</string>
+        </property>
+       </widget>
+      </item>
       <item>
        <layout class="QHBoxLayout" name="horizontalLayout_2">
         <item alignment="Qt::AlignRight">
@@ -129,9 +136,16 @@
          </widget>
         </item>
         <item>
-         <widget class="QTimeEdit" name="timeEdit">
+         <widget class="QTimeEdit" name="durationBox">
           <property name="displayFormat">
            <string>mm:ss</string>
+          </property>
+          <property name="time">
+           <time>
+            <hour>0</hour>
+            <minute>0</minute>
+            <second>30</second>
+           </time>
           </property>
          </widget>
         </item>
@@ -143,7 +157,7 @@
          </widget>
         </item>
         <item>
-         <widget class="QDoubleSpinBox" name="doubleSpinBox">
+         <widget class="QDoubleSpinBox" name="fPSBox">
           <property name="decimals">
            <number>4</number>
           </property>
@@ -157,9 +171,18 @@
      </layout>
     </item>
     <item row="2" column="0">
-     <widget class="QLabel" name="label_5">
-      <property name="text">
-       <string>The file'll be saved in the same directory</string>
+     <widget class="QProgressBar" name="progressBar">
+      <property name="enabled">
+       <bool>true</bool>
+      </property>
+      <property name="value">
+       <number>0</number>
+      </property>
+      <property name="textVisible">
+       <bool>false</bool>
+      </property>
+      <property name="invertedAppearance">
+       <bool>false</bool>
       </property>
      </widget>
     </item>

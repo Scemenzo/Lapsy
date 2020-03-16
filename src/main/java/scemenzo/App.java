@@ -1,7 +1,6 @@
 package scemenzo;
 
 import scemenzo.view.FinestraPrincipale;
-import scemenzo.view.FinestraTest;
 import scemenzo.utils.GenericUtilities;
 import scemenzo.utils.ResourceLoader;
 
@@ -27,9 +26,6 @@ public class App
 
                 FinestraPrincipale finestra = new FinestraPrincipale();
                 finestra.setVisible(true);
-
-                FinestraTest finestraTest = new FinestraTest();
-                finestraTest.setVisible(true);
 
             } catch (Exception e) {
                 System.out.println("Substance Graphite failed to initialize");

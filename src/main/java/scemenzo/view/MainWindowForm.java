@@ -1,8 +1,18 @@
 package scemenzo.view;
 
+import scemenzo.control.VideoConverter;
+
 import javax.swing.*;
 import java.awt.*;
-import java.awt.image.BufferedImage;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.dnd.DnDConstants;
+import java.awt.dnd.DropTarget;
+import java.awt.dnd.DropTargetAdapter;
+import java.awt.dnd.DropTargetDropEvent;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.File;
+import java.util.List;
 
 public class MainWindowForm extends JFrame {
 
@@ -14,10 +24,52 @@ public class MainWindowForm extends JFrame {
     private JButton startButton;
     private JLabel videoPathLabel;
 
+    private VideoConverter videoConverter;
+
     public MainWindowForm() throws HeadlessException {
         super("Lapsy");
         this.setContentPane(panel1);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.pack();
+
+        //popup("Test");
+
+        importVideoButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent event) {
+                JFileChooser fileChooser = new JFileChooser();
+                fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+                fileChooser.showDialog(panel1, "OK");
+                if(fileChooser.getSelectedFile() != null) {
+                    System.out.println("File selezionato: " + fileChooser.getSelectedFile().getPath());
+                    videoPathLabel.setText(fileChooser.getSelectedFile().getPath());
+                }
+            }
+        });
+
+        //Drop handling per videoPathLabel
+        DropTarget dropTarget = new DropTarget(this, new DropTargetAdapter() {
+            @Override
+            public void drop(DropTargetDropEvent event) {
+                event.acceptDrop(DnDConstants.ACTION_COPY_OR_MOVE);
+                try {
+                    List<File> droppedFiles = (List<File>)event.getTransferable().getTransferData(DataFlavor.javaFileListFlavor);
+                    for (File droppedFile : droppedFiles) {
+                        System.out.println("File droppato: " + droppedFile.getPath());
+                        videoPathLabel.setText(droppedFile.getPath());
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+
+        videoConverter = new VideoConverter(progressBar1);
+    }
+
+    public void popup(String message) {
+        this.setEnabled(false);
+        //crea dialog con messaggio
+        //rienabla tutto
     }
 }

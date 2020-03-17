@@ -48,7 +48,7 @@ public class ResourceLoader {
         if (!file.isFile()) {
             throw new IOException("L'URL " + resourcePath + " non punta ad un file");
         }
-        System.out.println("Caricato file: " + resourcePath);
+        System.out.println("Pre-caricato file: " + resourcePath);
         return file;
     }
 }

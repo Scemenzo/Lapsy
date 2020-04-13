@@ -1,5 +1,6 @@
 package scemenzo.view;
 
+import org.apache.commons.io.FilenameUtils;
 import scemenzo.control.VideoConverter;
 
 import javax.swing.*;
@@ -32,7 +33,7 @@ public class MainWindowForm extends JFrame {
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.pack();
 
-        //popup("Test");
+        videoConverter = new VideoConverter(progressBar1);
 
         importVideoButton.addActionListener(new ActionListener() {
             @Override
@@ -40,7 +41,7 @@ public class MainWindowForm extends JFrame {
                 JFileChooser fileChooser = new JFileChooser();
                 fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
                 fileChooser.showDialog(panel1, "OK");
-                if(fileChooser.getSelectedFile() != null) {
+                if (fileChooser.getSelectedFile() != null) {
                     System.out.println("File selezionato: " + fileChooser.getSelectedFile().getPath());
                     videoPathLabel.setText(fileChooser.getSelectedFile().getPath());
                 }
@@ -53,7 +54,7 @@ public class MainWindowForm extends JFrame {
             public void drop(DropTargetDropEvent event) {
                 event.acceptDrop(DnDConstants.ACTION_COPY_OR_MOVE);
                 try {
-                    List<File> droppedFiles = (List<File>)event.getTransferable().getTransferData(DataFlavor.javaFileListFlavor);
+                    List<File> droppedFiles = (List<File>) event.getTransferable().getTransferData(DataFlavor.javaFileListFlavor);
                     for (File droppedFile : droppedFiles) {
                         System.out.println("File droppato: " + droppedFile.getPath());
                         videoPathLabel.setText(droppedFile.getPath());
@@ -64,12 +65,28 @@ public class MainWindowForm extends JFrame {
             }
         });
 
-        videoConverter = new VideoConverter(progressBar1);
+        //Tasto di start
+        startButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent event) {
+                if ((int) durationSpinner.getValue() <= 0 || (int) framerateSpinner.getValue() <= 0) {
+                    popupError("I dati inseriti non sono validi per la conversione");
+                }
+                String inputFilePath = videoPathLabel.getText();
+                String outputFilePath = FilenameUtils.getPath(inputFilePath) + FilenameUtils.getBaseName(inputFilePath) + "_lapsed." + FilenameUtils.getExtension(inputFilePath);
+                popupInfo(outputFilePath);
+                videoConverter.convertVideo(inputFilePath, outputFilePath, (int) framerateSpinner.getValue(), (int) durationSpinner.getValue());
+            }
+        });
     }
 
-    public void popup(String message) {
-        this.setEnabled(false);
-        //crea dialog con messaggio
-        //rienabla tutto
+    private void popupInfo(String message) {
+        System.out.println("Popup info: " + message);
+        JOptionPane.showMessageDialog(this, message, "Informazione", JOptionPane.INFORMATION_MESSAGE);
+    }
+
+    private void popupError(String message) {
+        System.out.println("Popup error: " + message);
+        JOptionPane.showMessageDialog(this, message, "Attenzione!", JOptionPane.ERROR_MESSAGE);
     }
 }

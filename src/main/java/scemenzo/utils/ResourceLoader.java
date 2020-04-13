@@ -12,7 +12,8 @@ public class ResourceLoader {
     private static ResourceLoader singletonInstance = null;
 
     //Risorse
-    @Getter private Font fontMain;
+    @Getter
+    private Font fontMain;
 
     /**
      * Creazione dell'istanza singleton del Resourceloader. È essenziale
@@ -33,6 +34,7 @@ public class ResourceLoader {
 
     /**
      * Metodo per accedere all'istanza singleton di questa classe.
+     *
      * @return Istanza singleton globale di ResourceLoader.
      */
     public static ResourceLoader getInstance() {

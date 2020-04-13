@@ -18,11 +18,6 @@
 
   <dependencies>
     <dependency>
-      <groupId>org.bytedeco</groupId>
-      <artifactId>javacv</artifactId>
-      <version>1.5.2</version>
-    </dependency>
-    <dependency>
       <groupId>org.pushing-pixels</groupId>
       <artifactId>radiance-substance</artifactId>
       <version>2.5.1</version>
@@ -38,6 +33,12 @@
       <artifactId>junit</artifactId>
       <version>4.11</version>
       <scope>test</scope>
+    </dependency>
+    <!-- https://mvnrepository.com/artifact/commons-io/commons-io -->
+    <dependency>
+      <groupId>commons-io</groupId>
+      <artifactId>commons-io</artifactId>
+      <version>2.6</version>
     </dependency>
   </dependencies>
 

@@ -9,9 +9,6 @@ import scemenzo.view.MainWindowForm;
 import javax.swing.*;
 import javax.swing.plaf.FontUIResource;
 
-/**
- * Hello world!
- */
 public class App {
     static {
         System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
